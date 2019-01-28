@@ -79,19 +79,19 @@
                   <v-stepper-content step="1" v-bind:class="widther">
                         <v-layout justify-center text-xs-center class="pa-3">
                                 <v-flex xs12>
-                                    <h2 class="headline font-weight-light pa-1 my-1">First, how big are you today?</h2>
-                                    <v-form ref="startform" v-model="valid">
-                                        <v-select
-                                        v-bind:items="sizeoptions"
-                                        v-model='sizeselection'
-                                        :ripple="{class: 'green--text'}"
-                                        color="green darken-2"
-                                        :rules="[v => !!v || 'Size is required']"
-                                        :menu-props="{auto: false}"
-                                        required
-                                        >
-                    
-                                        </v-select>
+                                    <h2 class="headline font-weight-light pa-1 my-3">First, how big are you today?</h2>
+
+                                    <v-layout d-flex v-bind='binding'>
+
+                                      <v-flex v-for='sizeoption in sizeoptions' xs12 md3>
+                                        <v-btn xs12 md3 :depressed='sizeoption==sizeselection' large :color="((sizeoption==sizeselection) ? 'green darken-2' : '')" v-bind:class="((sizeoption==sizeselection) ? 'white--text my-2 text-none subheading' : 'green--text text--darken-2 text-none subheading')" @click='sizeselection = sizeoption'>{{sizeoption}}</v-button>
+                                      
+                                      </v-flex>
+
+                                    </v-layout>
+
+                                    <v-form ref="startform" v-model="valid" class='my-3'>
+
                                         <v-btn
                                           :disabled="!valid"
                                           color="green darken-2"
@@ -447,9 +447,9 @@
             unselected: true,
             sublease: 1,
             traditionalshort: 2,
-            traditionallong: 3,
-            flexible: 5,
-            hybrid: 4
+            traditionallong: 4,
+            flexible: 4,
+            hybrid: 5
           }
           ,
           {
@@ -457,11 +457,11 @@
             placement:0,
             text:"We need to be where the action is.",
             unselected: true,
-            sublease: 3,
+            sublease: 2,
             traditionalshort: 1,
-            traditionallong: 4,
+            traditionallong: 3,
             flexible: 5,
-            hybrid: 2
+            hybrid: 4
           }
           ,
           {
@@ -482,8 +482,8 @@
             text:"I'm not signing a personal guaranty.",
             unselected: true,
             sublease: 4,
-            traditionalshort: 3,
-            traditionallong: 1,
+            traditionalshort: 1,
+            traditionallong: 0,
             flexible: 5,
             hybrid: 2
           }
@@ -493,11 +493,11 @@
             placement:0,
             text:"I need my own space.",
             unselected: true,
-            sublease: 2,
+            sublease: 3,
             traditionalshort: 4,
             traditionallong: 5,
             flexible: 1,
-            hybrid: 3
+            hybrid: 2
           }
           ,
           {
@@ -505,11 +505,11 @@
             placement:0,
             text:"I need the dog at work to help code.",
             unselected: true,
-            sublease: 1,
-            traditionalshort: 3,
+            sublease: 2,
+            traditionalshort: 4,
             traditionallong: 5,
-            flexible: 2,
-            hybrid: 4
+            flexible: 1,
+            hybrid: 2
           }
           ,
           {
@@ -518,9 +518,9 @@
             text:"I need it to grow. I hate moving.",
             unselected: true,
             sublease: 1,
-            traditionalshort: 4,
-            traditionallong: 2,
-            flexible: 3,
+            traditionalshort: 2,
+            traditionallong: 3,
+            flexible: 4,
             hybrid: 5
           }
           ,
@@ -533,18 +533,18 @@
             traditionalshort: 3,
             traditionallong: 1,
             flexible: 5,
-            hybrid: 2
+            hybrid: 3
           },
           {
             id: 10,
             placement:0,
             text:"Anybody but this landlord.",
             unselected: true,
-            sublease: 5,
+            sublease: 4,
             traditionalshort: 2,
-            traditionallong: 3,
-            flexible: 4,
-            hybrid: 1
+            traditionallong: 1,
+            flexible: 5,
+            hybrid: 3
           }
         ],
         options: [
@@ -687,10 +687,10 @@
           {
             name: "25 to 100",
             moniker: "medium",
-            sublease: 2,
-            traditionalshort: 5,
+            sublease: 5,
+            traditionalshort: 3,
             traditionallong: 1,
-            flexible: 3,
+            flexible: 2,
             hybrid: 4,
             introheading: "Multiple teams, 25 to 100 people.",
             firstparagraph: "You’re no longer a small team and your space now reflects that growth. It’s amazing to see your company expand and flourish from a spark of an idea to a fully functioning venture. Though you’ve crossed several workspace thresholds, progression and continued success should actively remain goals to keep top of mind. Again, securing and retaining talent with ideal locations and appealing amenities that enhance the employee experience is still a major focus. Visibility and recognition in the marketplace are crucial to your company’s reputation and prospects. Therefore, solid branding incorporated into workspace design is a must. Flexible, well-designed spaces that suit your company’s needs and support its culture come to the forefront.",
