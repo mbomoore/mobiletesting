@@ -1,0 +1,548 @@
+<html style="overflow-y:scroll">
+<head>
+    <link href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons' rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <style>
+    
+        .sentence-move {
+            transition: transform 1s;
+        }
+        .sentence-enter, .sentence-leave{
+            transition: all .2s;
+            opacity: 0;
+        }
+    </style>
+  </head>
+
+<body>
+  
+  <!-- Vue works with this div -->
+  <div id="app">
+    <v-app light>
+      
+      <v-container fluid>
+
+        <v-layout justify-center fill-height text-xs-center v-bind="binding" ref="qbox" style="max-height:35%;min-height:300px">
+          
+          <v-flex xs12 md6 class="mr-2" style="max-height:95%;">
+                <h2 class="headline font-weight-light">Pick 5 from these:</h2>
+                <div style="max-height:85%; overflow-y: scroll;">
+            <transition-group name = "sentence">
+            <v-card light v-for="sentence in sentences" v-if="sentence.unselected" :key="sentence.id" color="green">
+              <v-card-text light v-on:click="flipstatusun(sentence.id)" class="sentence white--text my-2 pa-1 body-1">{{sentence.text}}</v-card-text>
+            </v-card>
+            </transition-group>
+            </div>
+          </v-flex>
+          
+        
+
+          <v-flex xs12 md6 class="ml-2">
+                <h2 class="headline font-weight-light">You've said:</h2>
+              <transition-group name = "sentence">
+              <v-card light v-for="sentence in sortedSentences" v-if="!sentence.unselected" :key="sentence.id" color="green">
+                  <v-card-text light v-on:click="flipstatussel(sentence.id)" class="sentence white--text my-2 pa-1 body-1">{{sentence.text}}</v-card-text>
+              </v-card>
+            </transition-group>
+          </v-flex>
+
+        </v-layout>
+        <v-divider></v-divider>
+        <v-layout align-center text-xs-center>
+            <v-flex xs12>
+              <h2 class="display-1 font-weight-light ma-2">Your real estate roadmap:</h2>
+            </v-flex>
+
+              <v-dialog
+                v-model="fldialog"
+              >
+                
+                <v-card>
+                  <v-card-title
+                    class="headline grey lighten-2"
+                    primary-title
+                  >
+                    Coworking
+                  </v-card-title>
+                  <v-card-text>
+                    You're just starting out and your business doesn’t have legs yet but you have enough traction that it's time to graduate from the garage or coffee shop. You're not known in the market yet and you're looking for a co-founder or your first few core strategic hires. You are scrappy and are always looking for a creative solution as opposed to an expensive one. You don't know where you'll be in 6 months, let alone five years. But you're excited, optimistic, and ready for the the journey that lies ahead.
+                  </v-card-text>
+                  <v-divider></v-divider>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      color="green"
+                      flat
+                      @click="fldialog = false">
+                      OK!
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-dialog>
+
+            <v-dialog
+              v-model="subdialog"
+            >
+              
+              <v-card>
+                <v-card-title
+                  class="headline grey lighten-2"
+                  primary-title
+                >
+                  Sublease
+                </v-card-title>
+                <v-card-text>
+                    Based on your criteria, you are in the 90% of founders who wants it all! You're starting to pick up steam and a shared space isn't cutting it. The sales team needs some private space to do their jobs and the lines at the bathroom are outrageous. However, you're not trying to spend an arm and a leg on building out a space you're going to (hopefully) blow out of in next 18 months. You need functional space where your customers can come see all the blood, sweat, and tears your employees are putting into your company. You also need a space that will help you with recruiting, but you acknowledge that this is a temporary home until you hit your ARR numbers and need to recruit the next wave of talent to drive your business forward.
+                </v-card-text>
+                <v-divider></v-divider>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="green"
+                    flat
+                    @click="subdialog = false">
+                    OK!
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+
+            <v-dialog
+            v-model="tsdialog"
+            >
+            
+            <v-card>
+              <v-card-title
+                class="headline grey lighten-2"
+                primary-title
+              >
+                Traditional Lease - Short Term
+              </v-card-title>
+              <v-card-text>
+                  You've gotten to an inflection point in your business where you're starting to see that your company needs an identity. Personal brand and culture have become common themes in management meetings as your business is hitting it's stride and the team diliberates on the next iteration of what the company is and stands for. You have your core team locked in and your early hires are starting to move into management roles. You need a space that says "we're legit and you might get to be part of something special" to any potential recruit who walks in the door. However, you're also seeing longer sales cycles and less new logos. You know you have a place in the market, but you're not sure how big your piece of pie will end up being. You're being cautiously optimistic before you dive in headfirst.
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="green"
+                  flat
+                  @click="tsdialog = false">
+                  OK!
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+
+          <v-dialog
+          v-model="tldialog"
+          >
+          
+          <v-card>
+            <v-card-title
+              class="headline grey lighten-2"
+              primary-title
+            >
+              Traditional Lease - Long Term
+            </v-card-title>
+            <v-card-text>
+                Your business is flourishing and doesn’t seem to be slowing down anytime soon. It's clear that you're becoming a player in your market and it's time to compete on the talent front like you never have before. Your management team is maturing and starting to carry out strategic initatives as opposed to focusing on your MVP. It's time to put a flag in the ground somewhere you can build your home base. It's time for landlords to compete over you as your credibility continues to grow. 
+            </v-card-text>
+            <v-divider></v-divider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="green"
+                flat
+                @click="tldialog = false">
+                OK!
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <v-dialog
+        v-model="hydialog"
+        >
+        
+        <v-card>
+          <v-card-title
+            class="headline grey lighten-2"
+            primary-title
+          >
+            Hybrid
+          </v-card-title>
+          <v-card-text>
+              You're growing quickly and you don't anticipate a slow down anytime soon. That being said, you're growing so fast, you think your rate of growth will have to slow down eventually. Time to hedge your bets. If the market turns, you can offload a significant portion of costs almost immediately, without having to scramble to find a new space to operate in. You don't need everyone to be under one roof, as your teams are already functioning independently. 
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green"
+              flat
+              @click="hydialog = false">
+              OK!
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+
+        </v-layout>
+        <v-divider></v-divider>
+        <v-layout align-center text-xs-center>
+          <v-flex xs3>
+            <h3 class="title font-weight-thin ma-2">1 to 5</br>Employees</h3>
+          </v-flex>
+          <v-flex xs3>
+            <h3 class="title font-weight-thin ma-2">5 to 25</br>Employees</h3>
+          </v-flex>
+          <v-flex xs3>
+            <h3 class="title font-weight-thin ma-2">25 to 100</br>Employees</h3>
+          </v-flex>
+          <v-flex xs3>
+            <h3 class="title font-weight-thin ma-2">100+</br>Employees</h3>
+          </v-flex>
+
+        </v-layout>
+
+        <v-layout align-center text-xs-center>
+            <v-flex xs3>
+                <transition-group name = "sentence">
+                    <v-card light v-for="(option, index) in sortedtinyOptions" :key="option.name" v-bind:class='colorcalc(index)' class="ma-2">
+                      <v-card-text light class="sentence white--text pa-1 body-1" v-on:click='dialogon(option.dialog)'>{{option.fullName}}</v-card-text>
+                    </v-card>
+                </transition-group>
+            </v-flex>
+            <v-flex xs3>
+                <transition-group name = "sentence">
+                    <v-card light v-for="(option, index) in sortedsmallOptions" :key="option.name" v-bind:class='colorcalc(index)' class="ma-2">
+                      <v-card-text light class="sentence white--text pa-1 body-1" v-on:click='dialogon(option.dialog)'>{{option.fullName}}</v-card-text>
+                    </v-card>
+                </transition-group>
+            </v-flex>
+            <v-flex xs3>
+                <transition-group name = "sentence">
+                    <v-card light v-for="(option, index) in sortedmediumOptions" :key="option.name" v-bind:class='colorcalc(index)' class="ma-2">
+                      <v-card-text light class="sentence white--text pa-1 body-1" v-on:click='dialogon(option.dialog)'>{{option.fullName}}</v-card-text>
+                    </v-card>
+                </transition-group>
+            </v-flex>
+            <v-flex xs3>
+                <transition-group name = "sentence">
+                    <v-card light v-for="(option, index) in sortedlargeOptions" :key="option.name" v-bind:class='colorcalc(index)' class="ma-2">
+                      <v-card-text light class="sentence white--text pa-1 body-1" v-on:click='dialogon(option.dialog)'>{{option.fullName}}</v-card-text>
+                    </v-card>
+                </transition-group>
+            </v-flex>
+          </v-layout>
+
+      </v-container>
+    </v-app>
+  </div>
+  
+  <!-- Load Vue script -->
+  <script src="https://vuejs.org/js/vue.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+  
+  <!-- On load, init Vue -->
+  <script>
+
+    
+
+    window.onload=function(){
+
+      var unlist=[
+          {name: "sublease", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "traditionalshort", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "traditionallong", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "flexible", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "hybrid", tiny: 0, small: 0, medium: 0, large: 0},
+        ]
+
+      var data={
+        title: "Hello",
+        numberselected:0,
+        sentences: [
+          {
+            id: 0,
+            placement:0,
+            text:"Cheap, cheap or even cheaper.",
+            unselected:true,
+            sublease: 5,
+            traditionalshort: 2,
+            traditionallong: 3,
+            flexible: 1,
+            hybrid: 4
+          },
+          {
+            id: 1,
+            placement:0,
+            text:"I don't have cash on hand to set it up.",
+            unselected: true,
+            sublease: 4,
+            traditionalshort: 1,
+            traditionallong: 2,
+            flexible: 5,
+            hybrid: 3
+          }
+          ,
+          {
+            id: 2,
+            placement:0,
+            text:"Perks please, we need to recruit the best!",
+            unselected: true,
+            sublease: 1,
+            traditionalshort: 2,
+            traditionallong: 3,
+            flexible: 5,
+            hybrid: 4
+          }
+          ,
+          {
+            id: 3,
+            placement:0,
+            text:"We need to be where the action is.",
+            unselected: true,
+            sublease: 3,
+            traditionalshort: 1,
+            traditionallong: 4,
+            flexible: 5,
+            hybrid: 2
+          }
+          ,
+          {
+            id: 4,
+            placement:0,
+            text:"I needed it yesterday!",
+            unselected: true,
+            sublease: 3,
+            traditionalshort: 2,
+            traditionallong: 1,
+            flexible: 5,
+            hybrid: 4
+          }
+          ,
+          {
+            id: 5,
+            placement:0,
+            text:"I'm not signing a personal guaranty.",
+            unselected: true,
+            sublease: 4,
+            traditionalshort: 3,
+            traditionallong: 1,
+            flexible: 5,
+            hybrid: 2
+          }
+          ,
+          {
+            id: 6,
+            placement:0,
+            text:"I need my own space.",
+            unselected: true,
+            sublease: 2,
+            traditionalshort: 4,
+            traditionallong: 5,
+            flexible: 1,
+            hybrid: 3
+          }
+          ,
+          {
+            id: 7,
+            placement:0,
+            text:"I need the dog at work to help code.",
+            unselected: true,
+            sublease: 1,
+            traditionalshort: 3,
+            traditionallong: 5,
+            flexible: 2,
+            hybrid: 4
+          }
+          ,
+          {
+            id: 8,
+            placement:0,
+            text:"I need it to grow. I hate moving.",
+            unselected: true,
+            sublease: 1,
+            traditionalshort: 4,
+            traditionallong: 2,
+            flexible: 3,
+            hybrid: 5
+          }
+          ,
+          {
+            id: 9,
+            placement:0,
+            text:"I have serious commitment issues.",
+            unselected: true,
+            sublease: 4,
+            traditionalshort: 3,
+            traditionallong: 1,
+            flexible: 5,
+            hybrid: 2
+          },
+          {
+            id: 10,
+            placement:0,
+            text:"Anybody but this landlord.",
+            unselected: true,
+            sublease: 5,
+            traditionalshort: 2,
+            traditionallong: 3,
+            flexible: 4,
+            hybrid: 1
+          }
+        ],
+        options: [
+          {name: "sublease", dialog:"subdialog", fullName: "Sublease", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "traditionalshort",dialog:"tsdialog", fullName: "Lease - Short", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "traditionallong", dialog:"tldialog", fullName: "Lease - Long", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "flexible",dialog:"fldialog", fullName: "Coworking", tiny: 0, small: 0, medium: 0, large: 0},
+          {name: "hybrid", dialog:"hydialog", fullName: "Hybrid", tiny: 0, small: 0, medium: 0, large: 0},
+        ],
+        sizes: [
+          {
+            name: "1 to 5",
+            moniker: "tiny",
+            sublease: 4,
+            traditionalshort: 3,
+            traditionallong: 1,
+            flexible: 5,
+            hybrid: 0
+          },
+          {
+            name: "5 to 25",
+            moniker: "small",
+            sublease: 4,
+            traditionalshort: 3,
+            traditionallong: 1,
+            flexible: 5,
+            hybrid: 0
+          },
+          {
+            name: "25 to 100",
+            moniker: "medium",
+            sublease: 2,
+            traditionalshort: 5,
+            traditionallong: 1,
+            flexible: 3,
+            hybrid: 4
+          },
+          {
+            name: "100+",
+            moniker: "large",
+            sublease: 2,
+            traditionalshort: 3,
+            traditionallong: 4,
+            flexible: 1,
+            hybrid: 5
+          }
+        ],
+        values: [.25,.15,.15,.05,.05],
+        monikers:["tiny","small","medium","large"],
+        subdialog:false,
+        tsdialog:false,
+        tldialog:false,
+        fldialog:false,
+        hydialog:false
+        }
+
+      new Vue({
+        el: '#app', // Vue works with this div (see line 4)
+        data: data, // title is set to 'Hello.'
+        methods:{
+          dialogon: function(name){
+            this[name]=true
+          },
+
+          colorcalc: function(index){
+            if (index==0){
+              return('green elevation-12')
+            }else{
+              return('green lighten-3')
+            }
+
+          },
+
+          calculatepreferences: function(){
+            for(option in this.options){
+              var opname=this.options[option].name
+              for(size in this.sizes){
+                this.options[option][this.sizes[size].moniker]=.35*this.sizes[size][opname]
+              }
+              for(sentence in this.sentences){
+                if(this.sentences[sentence].placement!=0){
+                  for(moniker in this.monikers){
+                    this.options[option][this.monikers[moniker]] += this.sentences[sentence][opname]*this.values[this.sentences[sentence].placement-1]
+                  }
+                }
+              }
+            }
+            this.$forceUpdate()
+          },
+
+          reorderplacement: function(numberx){
+            for (sentence in this.sentences){
+
+              if(this.sentences[sentence].placement>numberx){
+                this.sentences[sentence].placement--
+              }
+
+            }
+          },
+
+          flipstatusun: function(say) {
+            if (this.numberselected<5){
+            this.sentences[say].unselected=!this.sentences[say].unselected
+            this.sentences[say].placement=this.numberselected+1
+            this.numberselected++
+            this.calculatepreferences()
+            }
+          },
+
+          flipstatussel: function(say) {
+            this.sentences[say].unselected=!this.sentences[say].unselected
+            this.reorderplacement(this.sentences[say].placement)
+            this.sentences[say].placement=0
+            this.numberselected--
+            this.calculatepreferences()
+          }
+
+        },
+        beforeMount(){
+          this.calculatepreferences()
+        },
+
+        computed:{
+          sortedSentences: function(){
+            return this.sentences.concat().filter(a=>a.placement!=0).sort((a,b)=>a.placement-b.placement)
+          },
+          sortedtinyOptions: function(){
+            return this.options.concat().sort((a,b)=>b.tiny-a.tiny)
+          },
+          sortedsmallOptions: function(){
+            return this.options.concat().sort((a,b)=>b.small-a.small)
+          },
+          sortedmediumOptions: function(){
+            return this.options.concat().sort((a,b)=>b.medium-a.medium)
+          },
+          sortedlargeOptions: function(){
+            return this.options.concat().sort((a,b)=>b.large-a.large)
+          },
+          binding () {
+            const binding = {}
+
+            if (this.$vuetify.breakpoint.smAndDown) binding.column = true
+
+            return binding
+        }
+        }
+        
+      });
+
+    }
+  </script>
+</body> 
